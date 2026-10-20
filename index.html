@@ -4,267 +4,975 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#6f3e2e">
-  <title>NayCookies | Freshly Baked With Love</title>
+  <meta name="theme-color" content="#713f32">
+  <meta name="description" content="Pesan cookies favoritmu di NayCookies. Fresh, manis, dan dibuat dengan cinta.">
+  <title>NayCookies — Homemade Cookies</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    * { box-sizing: border-box; }
+    :root {
+      --brown: #713f32;
+      --brown-dark: #4c2923;
+      --cream: #fff8f0;
+      --pink: #f7d9d5;
+      --pink-light: #fff0ee;
+      --text: #352521;
+      --muted: #82716b;
+      --white: #ffffff;
+      --border: #eadbd3;
+      --green: #287a50;
+      --shadow: 0 12px 35px rgba(83, 48, 35, .09);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #fffaf4;
-      color: #43291f;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: var(--cream);
+      line-height: 1.6;
     }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
     header {
-      background: #6f3e2e;
-      color: white;
-      padding: 18px 6%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
+      background: rgba(255, 248, 240, .96);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(12px);
     }
-    .logo { font-size: 24px; font-weight: bold; }
+
+    .navbar {
+      max-width: 1120px;
+      margin: auto;
+      padding: 14px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      color: var(--brown);
+      font-size: 24px;
+      font-weight: 900;
+      text-decoration: none;
+      letter-spacing: -.8px;
+    }
+
+    .brand span {
+      color: #d18b80;
+    }
+
+    .nav-link {
+      color: var(--brown);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
     .hero {
-      padding: 55px 6%;
-      background: #f4dfc8;
+      max-width: 1120px;
+      margin: auto;
+      padding: 65px 22px 55px;
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      align-items: center;
+      gap: 35px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 7px 13px;
+      border-radius: 30px;
+      background: var(--pink);
+      color: var(--brown);
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      margin: 18px 0;
+      color: var(--brown-dark);
+      font-size: clamp(38px, 6vw, 62px);
+      line-height: 1.08;
+      letter-spacing: -2px;
+    }
+
+    h1 span {
+      color: #c77c70;
+    }
+
+    .hero p {
+      max-width: 510px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .primary-btn, .secondary-btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 20px;
+      font-weight: 800;
+      text-decoration: none;
+      transition: .2s;
+    }
+
+    .primary-btn {
+      background: var(--brown);
+      color: white;
+    }
+
+    .primary-btn:hover {
+      background: var(--brown-dark);
+      transform: translateY(-1px);
+    }
+
+    .secondary-btn {
+      background: var(--pink-light);
+      color: var(--brown);
+      border: 1px solid var(--border);
+    }
+
+    .hero-art {
+      min-height: 270px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 35px;
+      background: radial-gradient(circle at 30% 25%, #fff 0, #f6d4c6 48%, #e9b9aa 100%);
+      box-shadow: var(--shadow);
+      font-size: 115px;
       text-align: center;
     }
-    .hero h1 { font-size: clamp(30px, 6vw, 48px); margin: 0 0 12px; }
-    .hero p { line-height: 1.7; }
-    button {
-      border: 0;
-      border-radius: 10px;
-      padding: 12px 17px;
-      cursor: pointer;
-      font-weight: bold;
-      background: #6f3e2e;
-      color: white;
+
+    .section {
+      max-width: 1120px;
+      margin: auto;
+      padding: 32px 22px 55px;
     }
-    button:hover { opacity: .88; }
-    main { padding: 30px 6%; }
-    h2 { margin-bottom: 20px; }
+
+    .section-heading {
+      margin-bottom: 25px;
+    }
+
+    .section-heading h2 {
+      margin: 0 0 5px;
+      color: var(--brown-dark);
+      font-size: 30px;
+    }
+
+    .section-heading p {
+      margin: 0;
+      color: var(--muted);
+    }
+
     .products {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
     }
-    .product {
-      background: white;
-      border: 1px solid #eadbce;
-      border-radius: 16px;
+
+    .product-card {
       overflow: hidden;
-      padding-bottom: 18px;
-    }
-    .cookie-art {
-      height: 160px;
-      display: grid;
-      place-items: center;
-      font-size: 75px;
-      background: #f3e2cf;
-    }
-    .product h3, .product p, .product .price {
-      margin: 12px 16px;
-    }
-    .price { font-weight: bold; color: #8b4d32; }
-    .product button { margin-left: 16px; }
-    .panel {
       background: white;
-      border: 1px solid #eadbce;
-      border-radius: 16px;
-      padding: 20px;
-      margin-top: 28px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(83, 48, 35, .04);
     }
+
+    .product-art {
+      min-height: 150px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: var(--pink-light);
+      font-size: 67px;
+    }
+
+    .product-info {
+      padding: 16px;
+    }
+
+    .product-info h3 {
+      margin: 0 0 5px;
+      font-size: 17px;
+    }
+
+    .product-info p {
+      min-height: 42px;
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .product-bottom {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .price {
+      color: var(--brown);
+      font-weight: 900;
+    }
+
+    .add-btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 9px 12px;
+      color: white;
+      background: var(--brown);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .checkout-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: white;
+      box-shadow: var(--shadow);
+    }
+
+    .panel h3 {
+      margin: 0 0 18px;
+      color: var(--brown-dark);
+      font-size: 21px;
+    }
+
+    .empty-cart {
+      padding: 25px 10px;
+      color: var(--muted);
+      text-align: center;
+    }
+
     .cart-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cart-item-name {
+      font-weight: 800;
+    }
+
+    .cart-item-price {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .quantity-controls button {
+      width: 29px;
+      height: 29px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--cream);
+      color: var(--brown);
+      font-weight: 900;
+    }
+
+    .remove-btn {
+      margin-left: 5px;
+      color: #b44343 !important;
+      background: #fff0f0 !important;
+    }
+
+    .cart-total {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
-      margin: 12px 0;
+      gap: 15px;
+      margin: 20px 0;
+      padding-top: 14px;
+      border-top: 2px dashed var(--border);
+      font-size: 18px;
+      font-weight: 900;
     }
-    label { display: block; margin-top: 14px; font-weight: bold; }
-    input, select, textarea {
+
+    .field {
+      margin-bottom: 15px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .field input, .field select, .field textarea {
+      display: block;
       width: 100%;
-      margin-top: 7px;
-      padding: 12px;
-      border: 1px solid #d8c6b8;
-      border-radius: 9px;
-      font: inherit;
+      padding: 12px 13px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      outline: none;
+      color: var(--text);
       background: white;
     }
-    .total { font-size: 19px; font-weight: bold; margin: 20px 0; }
-    footer {
-      text-align: center;
-      padding: 25px;
-      background: #6f3e2e;
-      color: white;
-      margin-top: 35px;
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: #c77c70;
+      box-shadow: 0 0 0 3px rgba(199, 124, 112, .12);
     }
-    .hint { color: #775f52; font-size: 14px; line-height: 1.6; }
+
+    .field textarea {
+      min-height: 85px;
+      resize: vertical;
+    }
+
+    .hint {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .full-btn {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .notice {
+      display: none;
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 12px;
+      overflow-wrap: anywhere;
+      font-size: 14px;
+    }
+
+    .notice.success {
+      display: block;
+      color: #205c3d;
+      background: #e9f8ef;
+      border: 1px solid #b9e5c9;
+    }
+
+    .notice.error {
+      display: block;
+      color: #8a2727;
+      background: #fff0f0;
+      border: 1px solid #f0c4c4;
+    }
+
+    .notice.info {
+      display: block;
+      color: var(--brown);
+      background: var(--pink-light);
+      border: 1px solid var(--border);
+    }
+
+    .small-note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    footer {
+      margin-top: 20px;
+      padding: 28px 20px;
+      background: var(--brown-dark);
+      color: #fff4ec;
+      text-align: center;
+    }
+
+    footer strong {
+      font-size: 20px;
+    }
+
+    footer p {
+      margin: 5px 0 0;
+      font-size: 13px;
+      opacity: .8;
+    }
+
+    @media (max-width: 850px) {
+      .products {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 42px;
+      }
+
+      .hero-art {
+        min-height: 210px;
+      }
+
+      .checkout-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .navbar {
+        padding: 12px 15px;
+      }
+
+      .brand {
+        font-size: 21px;
+      }
+
+      .section {
+        padding-right: 15px;
+        padding-left: 15px;
+      }
+
+      .panel {
+        padding: 17px;
+      }
+
+      .products {
+        gap: 12px;
+      }
+
+      .product-art {
+        min-height: 115px;
+        font-size: 52px;
+      }
+
+      .product-info {
+        padding: 12px;
+      }
+
+      .product-bottom {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .add-btn {
+        width: 100%;
+      }
+    }
   </style>
 </head>
+
 <body>
   <header>
-    <div class="logo">🍪 NayCookies</div>
-    <button onclick="document.getElementById('keranjang').scrollIntoView({behavior:'smooth'})">
-      Keranjang (<span id="jumlah">0</span>)
-    </button>
+    <nav class="navbar">
+      <a class="brand" href="#">Nay<span>Cookies.</span></a>
+      <a class="nav-link" href="#checkout">
+        Keranjang 🛒 <span id="cartBadge">0</span>
+      </a>
+    </nav>
   </header>
 
-  <section class="hero">
-    <h1>Fresh Cookies, Made With Love 🤎</h1>
-    <p>Cookies lezat untuk menemani setiap momen spesialmu.</p>
-    <button onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">
-      Lihat Menu
-    </button>
-  </section>
-
   <main>
-    <section id="menu">
-      <h2>🍪 Menu Cookies</h2>
-      <div class="products" id="daftarProduk"></div>
+    <section class="hero">
+      <div>
+        <span class="eyebrow">HOMEMADE WITH LOVE ♡</span>
+        <h1>Cookies enak,<br><span>mood pun naik.</span></h1>
+        <p>
+          Temukan cookies favorit lu di NayCookies.
+          Dibuat untuk menemani hari-hari manis dan momen spesialmu.
+        </p>
+        <a class="primary-btn" href="#produk">Lihat Menu Cookies 🍪</a>
+      </div>
+      <div class="hero-art" aria-label="Ilustrasi cookies">🍪</div>
     </section>
 
-    <section class="panel" id="keranjang">
-      <h2>🛒 Keranjang Belanja</h2>
-      <div id="isiKeranjang">Keranjang masih kosong, yuk pilih cookies!</div>
-      <div class="total">Total: <span id="total">Rp0</span></div>
+    <section class="section" id="produk">
+      <div class="section-heading">
+        <h2>Menu Favorit</h2>
+        <p>Pilih rasa favoritmu, lalu masukkan ke keranjang.</p>
+      </div>
 
-      <h2>📝 Data Pemesanan</h2>
-      <form id="formPesanan">
-        <label for="nama">Nama pemesan</label>
-        <input id="nama" required placeholder="Nama lengkap">
+      <div class="products" id="productList"></div>
+    </section>
 
-        <label for="hp">Nomor WhatsApp</label>
-        <input id="hp" required type="tel" placeholder="08xxxxxxxxxx">
+    <section class="section" id="checkout">
+      <div class="section-heading">
+        <h2>Checkout Pesanan</h2>
+        <p>Isi data dengan benar supaya pesananmu bisa diproses.</p>
+      </div>
 
-        <label for="metode">Metode pembayaran</label>
-        <select id="metode">
-          <option>COD</option>
-          <option>Transfer Bank</option>
-          <option>QRIS</option>
-        </select>
+      <div class="checkout-layout">
+        <section class="panel">
+          <h3>🛒 Keranjang Belanja</h3>
+          <div id="cartItems">
+            <div class="empty-cart">Keranjang lu masih kosong 🍪</div>
+          </div>
 
-        <label for="pengiriman">Pengambilan pesanan</label>
-        <select id="pengiriman">
-          <option>Diantar ke alamat</option>
-          <option>Ambil sendiri</option>
-        </select>
+          <div class="cart-total">
+            <span>Total</span>
+            <span id="cartTotal">Rp0</span>
+          </div>
 
-        <label for="alamat">Alamat / catatan pesanan</label>
-        <textarea id="alamat" rows="3" placeholder="Isi alamat jika diantar, atau catatan lainnya"></textarea>
+          <button class="secondary-btn" type="button" id="clearCart">
+            Kosongkan Keranjang
+          </button>
+        </section>
 
-        <p class="hint">
-          Ini masih versi percobaan. Pesanan belum dikirim ke pemilik dan belum tersimpan di database.
-        </p>
-        <button type="submit">Coba Checkout</button>
-      </form>
-      <div id="hasil" aria-live="polite"></div>
+        <section class="panel">
+          <h3>📝 Data Pemesan</h3>
+
+          <form id="formPesanan">
+            <div class="field">
+              <label for="nama">Nama lengkap *</label>
+              <input
+                id="nama"
+                name="nama"
+                type="text"
+                maxlength="100"
+                autocomplete="name"
+                placeholder="Nama pemesan"
+                required
+              >
+            </div>
+
+            <div class="field">
+              <label for="hp">Nomor WhatsApp *</label>
+              <input
+                id="hp"
+                name="hp"
+                type="tel"
+                maxlength="25"
+                autocomplete="tel"
+                placeholder="Contoh: 081234567890"
+                required
+              >
+            </div>
+
+            <div class="field">
+              <label for="pengiriman">Metode penerimaan *</label>
+              <select id="pengiriman" name="pengiriman" required>
+                <option value="delivery">Diantar ke alamat</option>
+                <option value="pickup">Ambil sendiri</option>
+              </select>
+            </div>
+
+            <div class="field" id="addressField">
+              <label for="alamat">Alamat lengkap *</label>
+              <textarea
+                id="alamat"
+                name="alamat"
+                maxlength="1000"
+                autocomplete="street-address"
+                placeholder="Jalan, nomor rumah, desa, kecamatan..."
+              ></textarea>
+            </div>
+
+            <div class="field">
+              <label for="metode">Metode pembayaran *</label>
+              <select id="metode" name="metode" required>
+                <option value="cod">COD / bayar saat pesanan diterima</option>
+                <option value="bank_transfer">Transfer bank</option>
+                <option value="qris">QRIS</option>
+              </select>
+              <p class="hint">
+                Untuk transfer bank atau QRIS, konfirmasi pembayaran
+                dilakukan setelah pemilik toko menghubungi lu.
+              </p>
+            </div>
+
+            <button
+              class="primary-btn full-btn"
+              id="submitBtn"
+              type="submit"
+            >
+              Buat Pesanan 🍪
+            </button>
+
+            <div id="hasil" class="notice" role="status" aria-live="polite"></div>
+
+            <p class="small-note">
+              Pesanan akan dicatat ke sistem NayCookies. Status awal
+              pesanan adalah menunggu konfirmasi.
+            </p>
+          </form>
+        </section>
+      </div>
     </section>
   </main>
 
-  <footer>© 2026 NayCookies · Freshly Baked With Love 🤎</footer>
+  <footer>
+    <strong>NayCookies 🍪</strong>
+    <p>Dibuat dengan cinta, untuk hari yang lebih manis.</p>
+  </footer>
 
   <script>
-    const produk = [
-      { id: 1, nama: "Choco Chip Cookies", harga: 35000, emoji: "🍪", deskripsi: "Cookies dengan choco chips." },
-      { id: 2, nama: "Double Chocolate", harga: 40000, emoji: "🍫", deskripsi: "Cokelat yang kaya rasa." },
-      { id: 3, nama: "Red Velvet Cookies", harga: 40000, emoji: "❤️", deskripsi: "Cookies red velvet yang lembut." },
-      { id: 4, nama: "Matcha Cookies", harga: 40000, emoji: "🍵", deskripsi: "Cookies dengan cita rasa matcha." }
+    "use strict";
+
+    // KONFIGURASI SUPABASE
+    const SUPABASE_URL =
+      "https://ohcohmrhnjjwhhmbggdp.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_F3qfvwEwH2lmkYCnRBI-Og_8csxHdEt";
+
+    // Pastikan library Supabase berhasil dimuat.
+    let supabaseClient = null;
+
+    if (window.supabase && window.supabase.createClient) {
+      supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
+    }
+
+    // DATA MENU
+    const products = [
+      {
+        id: "choco-chip",
+        name: "Choco Chip Cookies",
+        price: 35000,
+        emoji: "🍪",
+        description: "Cookies klasik dengan choco chip."
+      },
+      {
+        id: "double-chocolate",
+        name: "Double Chocolate",
+        price: 40000,
+        emoji: "🍫",
+        description: "Rasa cokelat yang lebih intens."
+      },
+      {
+        id: "red-velvet",
+        name: "Red Velvet Cookies",
+        price: 40000,
+        emoji: "❤️",
+        description: "Cookies red velvet yang manis."
+      },
+      {
+        id: "matcha",
+        name: "Matcha Cookies",
+        price: 40000,
+        emoji: "🍵",
+        description: "Cookies dengan cita rasa matcha."
+      }
     ];
 
-    const keranjang = {};
+    // Keranjang hanya disimpan sementara di halaman ini.
+    const cart = {};
 
-    const rupiah = angka => new Intl.NumberFormat("id-ID", {
-      style: "currency", currency: "IDR", maximumFractionDigits: 0
-    }).format(angka);
+    const rupiah = amount =>
+      new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        maximumFractionDigits: 0
+      }).format(amount);
 
-    function tampilkanProduk() {
-      document.getElementById("daftarProduk").innerHTML = produk.map(p => `
-        <article class="product">
-          <div class="cookie-art">${p.emoji}</div>
-          <h3>${p.nama}</h3>
-          <p>${p.deskripsi}</p>
-          <div class="price">${rupiah(p.harga)}</div>
-          <button type="button" onclick="tambah(${p.id})">+ Tambah</button>
+    const productList = document.getElementById("productList");
+    const cartItems = document.getElementById("cartItems");
+    const cartTotal = document.getElementById("cartTotal");
+    const cartBadge = document.getElementById("cartBadge");
+    const form = document.getElementById("formPesanan");
+    const hasil = document.getElementById("hasil");
+    const submitBtn = document.getElementById("submitBtn");
+    const pengiriman = document.getElementById("pengiriman");
+    const alamat = document.getElementById("alamat");
+    const addressField = document.getElementById("addressField");
+
+    function renderProducts() {
+      productList.innerHTML = products.map(product => `
+        <article class="product-card">
+          <div class="product-art">${product.emoji}</div>
+          <div class="product-info">
+            <h3>${product.name}</h3>
+            <p>${product.description}</p>
+            <div class="product-bottom">
+              <span class="price">${rupiah(product.price)}</span>
+              <button
+                class="add-btn"
+                type="button"
+                data-add="${product.id}"
+              >
+                + Tambah
+              </button>
+            </div>
+          </div>
         </article>
       `).join("");
     }
 
-    function tambah(id) {
-      keranjang[id] = (keranjang[id] || 0) + 1;
-      tampilkanKeranjang();
+    function getCartQuantity() {
+      return Object.values(cart).reduce((sum, qty) => sum + qty, 0);
     }
 
-    function ubahJumlah(id, perubahan) {
-      keranjang[id] = (keranjang[id] || 0) + perubahan;
-      if (keranjang[id] <= 0) delete keranjang[id];
-      tampilkanKeranjang();
+    function getCartTotal() {
+      return products.reduce((sum, product) => {
+        return sum + product.price * (cart[product.id] || 0);
+      }, 0);
     }
 
-    function tampilkanKeranjang() {
-      const item = produk.filter(p => keranjang[p.id]);
-      const banyak = item.reduce((sum, p) => sum + keranjang[p.id], 0);
-      const total = item.reduce((sum, p) => sum + p.harga * keranjang[p.id], 0);
+    function renderCart() {
+      const selectedProducts = products.filter(
+        product => (cart[product.id] || 0) > 0
+      );
 
-      document.getElementById("jumlah").textContent = banyak;
-      document.getElementById("total").textContent = rupiah(total);
+      cartBadge.textContent = getCartQuantity();
+      cartTotal.textContent = rupiah(getCartTotal());
 
-      document.getElementById("isiKeranjang").innerHTML = item.length
-        ? item.map(p => `
-          <div class="cart-item">
-            <div>${p.nama}<br>${rupiah(p.harga)} × ${keranjang[p.id]}</div>
-            <div>
-              <button type="button" onclick="ubahJumlah(${p.id},-1)">−</button>
-              <button type="button" onclick="ubahJumlah(${p.id},1)">+</button>
-            </div>
+      if (selectedProducts.length === 0) {
+        cartItems.innerHTML = `
+          <div class="empty-cart">
+            Keranjang lu masih kosong 🍪<br>
+            Yuk, pilih cookies favoritmu!
           </div>
-        `).join("")
-        : "Keranjang masih kosong, yuk pilih cookies!";
-
-      return total;
-    }
-
-    document.getElementById("formPesanan").addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      if (!Object.keys(keranjang).length) {
-        alert("Cuy, pilih cookies dulu sebelum checkout!");
+        `;
         return;
       }
 
-      const ringkasan = produk
-        .filter(p => keranjang[p.id])
-        .map(p => `${p.nama} x${keranjang[p.id]} = ${rupiah(p.harga * keranjang[p.id])}`)
-        .join("\n");
+      cartItems.innerHTML = selectedProducts.map(product => {
+        const qty = cart[product.id];
+        const subtotal = product.price * qty;
 
-      const nama = document.getElementById("nama").value.trim();
-      const hp = document.getElementById("hp").value.trim();
-      const metode = document.getElementById("metode").value;
-      const pengiriman = document.getElementById("pengiriman").value;
-      const alamat = document.getElementById("alamat").value.trim();
-
-      document.getElementById("hasil").innerHTML = `
-        <h3>Ringkasan Pesanan</h3>
-        <p>Nama: ${escapeHTML(nama)}</p>
-        <p>Nomor HP: ${escapeHTML(hp)}</p>
-        <p>Metode pembayaran: ${escapeHTML(metode)}</p>
-        <p>Pengiriman: ${escapeHTML(pengiriman)}</p>
-        <p>Alamat/catatan: ${escapeHTML(alamat || "-")}</p>
-        <pre style="white-space:pre-wrap">${escapeHTML(ringkasan)}</pre>
-        <p><b>Total: ${rupiah(tampilkanKeranjang())}</b></p>
-        <p class="hint">Ringkasan ini hanya tampil di perangkat ini. Pesanan belum dikirim.</p>
-      `;
-      document.getElementById("hasil").scrollIntoView({behavior:"smooth"});
-    });
-
-    function escapeHTML(teks) {
-      return teks.replace(/[&<>"']/g, karakter => ({
-        "&": "&amp;", "<": "&lt;", ">": "&gt;",
-        '"': "&quot;", "'": "&#39;"
-      })[karakter]);
+        return `
+          <div class="cart-item">
+            <div>
+              <div class="cart-item-name">${product.emoji} ${product.name}</div>
+              <div class="cart-item-price">
+                ${rupiah(product.price)} × ${qty}
+              </div>
+              <div class="quantity-controls">
+                <button type="button" data-minus="${product.id}"
+                  aria-label="Kurangi ${product.name}">−</button>
+                <span>${qty}</span>
+                <button type="button" data-plus="${product.id}"
+                  aria-label="Tambah ${product.name}">+</button>
+                <button type="button" class="remove-btn"
+                  data-remove="${product.id}">Hapus</button>
+              </div>
+            </div>
+            <strong>${rupiah(subtotal)}</strong>
+          </div>
+        `;
+      }).join("");
     }
 
-    tampilkanProduk();
-    tampilkanKeranjang();
+    function showNotice(message, type) {
+      hasil.className = "notice " + type;
+      hasil.textContent = message;
+    }
+
+    productList.addEventListener("click", event => {
+      const button = event.target.closest("[data-add]");
+      if (!button) return;
+
+      const id = button.dataset.add;
+      cart[id] = (cart[id] || 0) + 1;
+      renderCart();
+    });
+
+    cartItems.addEventListener("click", event => {
+      const button = event.target.closest("button");
+      if (!button) return;
+
+      if (button.dataset.plus) {
+        const id = button.dataset.plus;
+        cart[id] = (cart[id] || 0) + 1;
+      } else if (button.dataset.minus) {
+        const id = button.dataset.minus;
+        cart[id] = (cart[id] || 0) - 1;
+
+        if (cart[id] <= 0) {
+          delete cart[id];
+        }
+      } else if (button.dataset.remove) {
+        delete cart[button.dataset.remove];
+      }
+
+      renderCart();
+    });
+
+    document.getElementById("clearCart").addEventListener("click", () => {
+      for (const id of Object.keys(cart)) {
+        delete cart[id];
+      }
+      renderCart();
+    });
+
+    function updateAddressField() {
+      const needsDelivery = pengiriman.value === "delivery";
+      addressField.style.display = needsDelivery ? "block" : "none";
+      alamat.required = needsDelivery;
+
+      if (!needsDelivery) {
+        alamat.value = "";
+      }
+    }
+
+    pengiriman.addEventListener("change", updateAddressField);
+
+    function createOrderCode() {
+      const date = new Date();
+      const datePart = [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, "0"),
+        String(date.getDate()).padStart(2, "0")
+      ].join("");
+
+      const randomPart = Math.random().toString(36)
+        .slice(2, 8).toUpperCase();
+
+      return `NC-${datePart}-${randomPart}`;
+    }
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+
+      if (!supabaseClient) {
+        showNotice(
+          "Koneksi Supabase belum berhasil dimuat. Periksa koneksi internet dan konfigurasi Supabase.",
+          "error"
+        );
+        return;
+      }
+
+      if (getCartQuantity() === 0) {
+        showNotice("Keranjang masih kosong. Tambahkan cookies dulu, cuy!", "error");
+        return;
+      }
+
+      const customerName = document.getElementById("nama").value.trim();
+      const customerPhone = document.getElementById("hp").value.trim();
+      const fulfillmentMethod = pengiriman.value;
+      const deliveryAddress = alamat.value.trim();
+      const paymentMethod = document.getElementById("metode").value;
+
+      if (!customerName || !customerPhone) {
+        showNotice("Nama dan nomor WhatsApp wajib diisi.", "error");
+        return;
+      }
+
+      if (fulfillmentMethod === "delivery" && !deliveryAddress) {
+        showNotice("Alamat pengiriman wajib diisi.", "error");
+        return;
+      }
+
+      // Data item dan total disusun dari daftar produk di halaman.
+      const orderItems = products
+        .filter(product => (cart[product.id] || 0) > 0)
+        .map(product => {
+          const quantity = cart[product.id];
+
+          return {
+            id: product.id,
+            name: product.name,
+            unit_price: product.price,
+            quantity: quantity,
+            subtotal: product.price * quantity
+          };
+        });
+
+      const orderCode = createOrderCode();
+      const totalAmount = orderItems.reduce(
+        (sum, item) => sum + item.subtotal, 0
+      );
+
+      const orderData = {
+        order_code: orderCode,
+        customer_name: customerName,
+        customer_phone: customerPhone,
+        fulfillment_method: fulfillmentMethod,
+        delivery_address:
+          fulfillmentMethod === "delivery" ? deliveryAddress : null,
+        payment_method: paymentMethod,
+        payment_status: "pending",
+        order_status: "new",
+        items: orderItems,
+        total_amount: totalAmount
+      };
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Menyimpan pesanan...";
+      showNotice("Sedang menyimpan pesanan lu. Tunggu sebentar ya...", "info");
+
+      try {
+        const { error } = await supabaseClient
+          .from("orders")
+          .insert([orderData]);
+
+        if (error) {
+          console.error("Supabase insert error:", error);
+          throw error;
+        }
+
+        showNotice(
+          `Pesanan berhasil dicatat! Kode pesanan: ${orderCode}. Total: ${rupiah(totalAmount)}. Simpan kode ini dan tunggu konfirmasi dari NayCookies.`,
+          "success"
+        );
+
+        form.reset();
+
+        for (const id of Object.keys(cart)) {
+          delete cart[id];
+        }
+
+        renderCart();
+        updateAddressField();
+
+      } catch (error) {
+        console.error("Gagal menyimpan pesanan:", error);
+
+        let message =
+          "Pesanan belum berhasil disimpan. Periksa koneksi lalu coba lagi.";
+
+        if (error && error.code === "23505") {
+          message = "Kode pesanan bentrok. Silakan kirim pesanan sekali lagi.";
+        } else if (error && error.code === "42501") {
+          message =
+            "Akses database ditolak. Periksa kebijakan RLS untuk INSERT pada tabel orders.";
+        } else if (error && error.message) {
+          message += " Detail: " + error.message;
+        }
+
+        showNotice(message, "error");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Buat Pesanan 🍪";
+      }
+    });
+
+    renderProducts();
+    renderCart();
+    updateAddressField();
   </script>
 </body>
-</html>  
+</html>
