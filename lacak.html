@@ -1,610 +1,293 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#7b382b">
-  <title>Lacak Pesanan | NayCookies</title>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lacak Pesanan - NayCookies</title>
   <style>
-    :root {
-      --brown: #7b382b;
-      --dark: #54251e;
-      --cream: #fff8ef;
-      --pink: #f8e4dc;
-      --green: #237a49;
-      --muted: #786d67;
-      --border: #eadbd0;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: var(--cream);
-      color: #35251f;
       font-family: Arial, sans-serif;
+      background: #fff8f1;
+      color: #40291f;
     }
-
-    .header {
-      padding: 23px 16px;
-      background: var(--brown);
+    header {
+      background: #75452f;
       color: white;
+      padding: 20px;
       text-align: center;
     }
-
-    .header h1 {
-      margin: 0;
-      font-size: 27px;
-    }
-
-    .header p {
-      margin: 8px 0 0;
-      color: #ffeadc;
+    header h1 { margin: 0 0 8px; }
+    nav { margin-top: 14px; }
+    nav a {
+      color: white;
+      margin: 0 10px;
+      text-decoration: none;
       font-size: 14px;
     }
-
-    .container {
-      width: min(620px, 92%);
-      margin: 28px auto 50px;
+    main {
+      width: min(650px, 92%);
+      margin: 32px auto;
     }
-
-    .card {
+    .panel {
       background: white;
-      border: 1px solid var(--border);
-      border-radius: 17px;
-      padding: 22px;
-      margin-bottom: 18px;
-      box-shadow: 0 5px 18px #54251e0a;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 5px 22px #56351b12;
+      margin-bottom: 20px;
     }
-
-    h2 {
-      margin-top: 0;
-      font-size: 21px;
-    }
-
-    .muted {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
+    h2 { margin-top: 0; }
+    .muted { color: #796b62; line-height: 1.6; }
     label {
       display: block;
       font-weight: bold;
-      font-size: 14px;
-      margin: 16px 0 7px;
+      margin: 18px 0 8px;
     }
-
     input {
       width: 100%;
       padding: 13px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      border: 1px solid #ddc9b9;
+      border-radius: 9px;
       font-size: 16px;
-      outline-color: var(--brown);
     }
-
     button {
-      cursor: pointer;
-      border: 0;
-      border-radius: 10px;
-      padding: 13px 16px;
-      font-size: 15px;
-      font-weight: bold;
-    }
-
-    .primary {
       width: 100%;
-      margin-top: 17px;
+      margin-top: 14px;
+      padding: 14px;
+      background: #75452f;
       color: white;
-      background: var(--brown);
+      border: 0;
+      border-radius: 9px;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
     }
-
-    .primary:hover {
-      background: var(--dark);
+    button:disabled { opacity: .6; cursor: wait; }
+    .order {
+      border: 1px solid #eadfd5;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 14px;
     }
-
-    .primary:disabled {
-      opacity: .65;
-      cursor: wait;
+    .order h3 { margin: 0 0 12px; }
+    .status {
+      display: inline-block;
+      background: #f7eadc;
+      color: #75452f;
+      border-radius: 20px;
+      padding: 7px 11px;
+      font-weight: bold;
+      font-size: 13px;
+      margin: 4px 0 12px;
     }
-
-    .message {
-      font-size: 14px;
-      line-height: 1.6;
-      overflow-wrap: anywhere;
-    }
-
-    .error {
-      color: #b42318;
-    }
-
-    .success {
-      color: var(--green);
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .order-head {
+    .detail {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      flex-wrap: wrap;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border);
+      gap: 14px;
+      padding: 8px 0;
+      border-bottom: 1px solid #f2ebe5;
     }
-
-    .order-code {
-      font-size: 20px;
-      font-weight: bold;
-      color: var(--brown);
+    .detail span:last-child {
+      text-align: right;
       overflow-wrap: anywhere;
     }
-
-    .total {
-      font-weight: bold;
-      font-size: 19px;
-    }
-
-    .progress {
-      list-style: none;
-      padding: 0;
-      margin: 23px 0;
-    }
-
-    .step {
-      position: relative;
-      display: flex;
-      gap: 13px;
-      min-height: 68px;
-      padding-bottom: 17px;
-    }
-
-    .step:not(:last-child)::before {
-      content: "";
-      position: absolute;
-      left: 15px;
-      top: 32px;
-      width: 3px;
-      height: calc(100% - 15px);
-      background: #e9ddd6;
-    }
-
-    .step.done:not(:last-child)::before {
-      background: #78b88c;
-    }
-
-    .dot {
-      z-index: 1;
-      flex-shrink: 0;
-      display: grid;
-      place-items: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: #eee7e2;
-      color: #75675e;
-      font-weight: bold;
-    }
-
-    .step.done .dot {
-      background: #d9f3e1;
-      color: var(--green);
-    }
-
-    .step.current .dot {
-      background: var(--brown);
-      color: white;
-    }
-
-    .step-title {
-      margin: 5px 0 4px;
-      font-weight: bold;
-    }
-
-    .step-desc {
-      font-size: 13px;
+    .message {
+      margin-top: 14px;
       line-height: 1.5;
-      color: var(--muted);
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .info {
-      padding: 12px;
-      border-radius: 10px;
-      background: #fffaf5;
       overflow-wrap: anywhere;
     }
-
-    .info b {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 6px;
-    }
-
-    .items {
-      padding-left: 20px;
-      line-height: 1.7;
-    }
-
-    .badge {
-      display: inline-block;
-      background: var(--pink);
-      color: var(--dark);
-      border-radius: 30px;
-      padding: 7px 11px;
-      font-size: 13px;
-      font-weight: bold;
-    }
-
-    .back {
-      display: inline-block;
-      margin-top: 10px;
-      color: var(--brown);
-      text-decoration: none;
-      font-weight: bold;
-    }
-
     footer {
       text-align: center;
-      color: var(--muted);
-      padding: 15px;
-      font-size: 12px;
-    }
-
-    @media (max-width: 480px) {
-      .card {
-        padding: 17px;
-      }
-
-      .info-grid {
-        grid-template-columns: 1fr;
-      }
+      color: #796b62;
+      font-size: 13px;
+      padding: 20px;
     }
   </style>
 </head>
-
 <body>
-  <header class="header">
+  <header>
     <h1>🍪 NayCookies</h1>
-    <p>Lacak pesanan cookies favoritmu</p>
+    <div>Manisnya bikin bahagia</div>
+    <nav>
+      <a href="./index.html">Beranda</a>
+      <a href="./index.html#produk">Produk</a>
+      <a href="./lacak.html">Lacak Pesanan</a>
+    </nav>
   </header>
 
-  <main class="container">
-    <section class="card">
-      <h2>📦 Lacak Pesanan</h2>
+  <main>
+    <section class="panel">
+      <h2>Lacak Pesanan 📦</h2>
       <p class="muted">
-        Masukkan kode pesanan dan nomor WhatsApp yang digunakan saat checkout
-        untuk melihat perkembangan pesananmu.
+        Masukkan nomor WhatsApp yang kamu gunakan saat memesan.
+        Semua pesanan dengan nomor tersebut akan ditampilkan di sini.
       </p>
 
       <form id="trackForm">
-        <label for="orderCode">Kode pesanan</label>
-        <input
-          id="orderCode"
-          type="text"
-          placeholder="Contoh: NC-ABC123"
-          autocomplete="off"
-          required
-        >
-
-        <label for="phone">Nomor WhatsApp saat checkout</label>
+        <label for="phone">Nomor WhatsApp</label>
         <input
           id="phone"
           type="tel"
           inputmode="tel"
-          placeholder="Contoh: 081234567890"
           autocomplete="tel"
+          placeholder="Contoh: 081234567890"
           required
+          minlength="9"
+          maxlength="20"
         >
-
-        <button class="primary" id="trackBtn" type="submit">
-          🔍 Lacak Sekarang
-        </button>
-
-        <p id="message" class="message" role="status" aria-live="polite"></p>
+        <button id="searchBtn" type="submit">Cari Pesanan</button>
       </form>
+
+      <p id="message" class="message" role="status" aria-live="polite"></p>
     </section>
 
-    <section id="result" class="card hidden" aria-live="polite"></section>
-
-    <p class="muted">
-      Simpan kode pesananmu. Jika kamu lupa kode pesanan atau membutuhkan
-      bantuan, hubungi admin NayCookies melalui kontak resmi toko.
-    </p>
-
-    <a class="back" href="./index.html">← Kembali ke NayCookies</a>
+    <section id="results" class="panel" hidden>
+      <h2>Hasil Pencarian</h2>
+      <div id="orderList"></div>
+    </section>
   </main>
 
-  <footer>© NayCookies</footer>
+  <footer>© NayCookies — Terima kasih sudah memesan 🍪</footer>
 
   <script type="module">
     import { createClient } from
       "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-    const SUPABASE_URL =
-      "https://ohcohmrhnjjwhhmbggdp.supabase.co";
-
-    const SUPABASE_KEY =
-      "sb_publishable_F3qfvwEwH2lmkYCnRBI-Og_8csxHdEt";
+    const SUPABASE_URL = "https://ohcohmrhnjjwhhmbggdp.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_F3qfvwEwH2lmkYCnRBI-Og_8csxHdEt";
 
     const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const form = document.getElementById("trackForm");
-    const codeInput = document.getElementById("orderCode");
     const phoneInput = document.getElementById("phone");
-    const trackBtn = document.getElementById("trackBtn");
+    const searchBtn = document.getElementById("searchBtn");
     const message = document.getElementById("message");
-    const result = document.getElementById("result");
+    const results = document.getElementById("results");
+    const orderList = document.getElementById("orderList");
 
-    const steps = [
-      {
-        key: "new",
-        title: "Pesanan diterima",
-        desc: "Pesananmu sudah masuk ke sistem NayCookies."
-      },
-      {
-        key: "confirmed",
-        title: "Pesanan dikonfirmasi",
-        desc: "Pesananmu sudah dikonfirmasi oleh admin."
-      },
-      {
-        key: "processing",
-        title: "Cookies sedang dibuat",
-        desc: "Pesananmu sedang dipersiapkan."
-      },
-      {
-        key: "ready",
-        title: "Siap diambil atau dikirim",
-        desc: "Cookies sudah siap. Tunggu informasi dari admin."
-      },
-      {
-        key: "completed",
-        title: "Pesanan selesai",
-        desc: "Terima kasih sudah memesan di NayCookies!"
-      }
-    ];
-
-    const statusLabels = {
-      new: "Pesanan diterima",
+    const statusNames = {
+      new: "Pesanan masuk",
       confirmed: "Pesanan dikonfirmasi",
       processing: "Cookies sedang dibuat",
-      ready: "Siap diambil atau dikirim",
+      ready: "Siap diambil / dikirim",
       completed: "Pesanan selesai",
       cancelled: "Pesanan dibatalkan"
     };
 
-    const paymentLabels = {
+    const paymentNames = {
       pending: "Menunggu pembayaran",
-      paid: "Pembayaran terverifikasi",
+      paid: "Sudah dibayar",
       failed: "Pembayaran gagal"
     };
-
-    function escapeHTML(value) {
-      return String(value ?? "").replace(/[&<>"']/g, char => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-      })[char]);
-    }
 
     function rupiah(value) {
       return new Intl.NumberFormat("id-ID", {
         style: "currency",
         currency: "IDR",
         maximumFractionDigits: 0
-      }).format(Number(value) || 0);
+      }).format(value);
     }
 
-    function formatDate(value) {
-      const date = new Date(value);
+    function addDetail(parent, label, value) {
+      const row = document.createElement("div");
+      row.className = "detail";
 
-      if (Number.isNaN(date.getTime())) return "-";
+      const left = document.createElement("span");
+      left.textContent = label;
 
-      return date.toLocaleString("id-ID", {
-        dateStyle: "long",
-        timeStyle: "short"
-      });
+      const right = document.createElement("span");
+      right.textContent = value;
+
+      row.append(left, right);
+      parent.appendChild(row);
     }
 
-    function readItems(value) {
-      if (typeof value === "string") {
-        try {
-          value = JSON.parse(value);
-        } catch {
-          return [];
-        }
-      }
+    function showOrder(order) {
+      const card = document.createElement("article");
+      card.className = "order";
 
-      if (Array.isArray(value)) return value;
+      const title = document.createElement("h3");
+      title.textContent = "Pesanan " + order.order_code;
+      card.appendChild(title);
 
-      if (value && typeof value === "object") {
-        return Object.entries(value).map(([name, item]) => {
-          if (item && typeof item === "object") {
-            return { name, ...item };
-          }
+      const status = document.createElement("div");
+      status.className = "status";
+      status.textContent =
+        statusNames[order.order_status] || order.order_status;
+      card.appendChild(status);
 
-          return { name, quantity: item };
-        });
-      }
-
-      return [];
-    }
-
-    function describeItem(item) {
-      if (typeof item === "string") return item;
-
-      const name = item.name || item.product_name ||
-        item.title || "Cookies";
-
-      const qty = item.quantity ?? item.qty ?? item.jumlah ?? 1;
-
-      return `${name} × ${qty}`;
-    }
-
-    function setMessage(text, type = "") {
-      message.textContent = text;
-      message.className = "message" + (type ? " " + type : "");
-    }
-
-    function renderOrder(order) {
-      const currentIndex = steps.findIndex(
-        step => step.key === order.order_status
+      addDetail(card, "Kode pesanan", order.order_code);
+      addDetail(
+        card,
+        "Tanggal",
+        new Date(order.created_at).toLocaleString("id-ID", {
+          dateStyle: "medium",
+          timeStyle: "short"
+        })
+      );
+      addDetail(
+        card,
+        "Metode pesanan",
+        order.fulfillment_method === "delivery"
+          ? "Diantar"
+          : "Ambil sendiri"
+      );
+      addDetail(card, "Total", rupiah(order.total_amount));
+      addDetail(
+        card,
+        "Pembayaran",
+        paymentNames[order.payment_status] || order.payment_status
       );
 
-      let progressHTML = "";
-
-      if (order.order_status === "cancelled") {
-        progressHTML = `
-          <div class="info">
-            <b>Status pesanan</b>
-            Pesanan dibatalkan. Silakan hubungi admin jika kamu membutuhkan
-            penjelasan lebih lanjut.
-          </div>
-        `;
-      } else {
-        progressHTML = `
-          <ol class="progress">
-            ${steps.map((step, index) => {
-              const done = currentIndex >= index;
-              const current = currentIndex === index;
-
-              return `
-                <li class="step ${done ? "done" : ""} ${current ? "current" : ""}">
-                  <div class="dot">${done ? "✓" : index + 1}</div>
-                  <div>
-                    <div class="step-title">${step.title}</div>
-                    <div class="step-desc">${step.desc}</div>
-                  </div>
-                </li>
-              `;
-            }).join("")}
-          </ol>
-        `;
-      }
-
-      const items = readItems(order.items);
-      const itemsHTML = items.length
-        ? items.map(item =>
-            `<li>${escapeHTML(describeItem(item))}</li>`
-          ).join("")
-        : "<li>Detail produk tidak tersedia.</li>";
-
-      result.innerHTML = `
-        <div class="order-head">
-          <div>
-            <div class="muted">Kode pesanan</div>
-            <div class="order-code">${escapeHTML(order.order_code)}</div>
-          </div>
-          <div class="total">${escapeHTML(rupiah(order.total_amount))}</div>
-        </div>
-
-        <p><span class="badge">${
-          escapeHTML(statusLabels[order.order_status] || order.order_status)
-        }</span></p>
-
-        ${progressHTML}
-
-        <h2>Detail pesanan</h2>
-        <div class="info-grid">
-          <div class="info">
-            <b>Tanggal pesanan</b>
-            ${escapeHTML(formatDate(order.created_at))}
-          </div>
-          <div class="info">
-            <b>Pembayaran</b>
-            ${escapeHTML(paymentLabels[order.payment_status] || order.payment_status)}
-          </div>
-          <div class="info">
-            <b>Metode pembayaran</b>
-            ${escapeHTML(order.payment_method || "-")}
-          </div>
-          <div class="info">
-            <b>Metode pesanan</b>
-            ${escapeHTML(order.fulfillment_method === "pickup"
-              ? "Ambil sendiri"
-              : "Delivery")}
-          </div>
-        </div>
-
-        <h2 style="margin-top:22px">🍪 Cookies yang dipesan</h2>
-        <ul class="items">${itemsHTML}</ul>
-
-        <p class="muted">
-          Status ini menampilkan informasi terakhir yang tercatat.
-          Tekan tombol lacak lagi untuk memeriksa pembaruan terbaru.
-        </p>
-
-        <button id="againBtn" class="primary" type="button">
-          ↻ Perbarui status
-        </button>
-      `;
-
-      result.classList.remove("hidden");
-
-      document.getElementById("againBtn").addEventListener("click", () => {
-        form.requestSubmit();
-      });
+      orderList.appendChild(card);
     }
 
-    form.addEventListener("submit", async event => {
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      const code = codeInput.value.trim();
       const phone = phoneInput.value.trim();
+      const digits = phone.replace(/[^0-9]/g, "");
 
-      if (!code || !phone) {
-        setMessage("Kode pesanan dan nomor WhatsApp wajib diisi.", "error");
+      if (digits.length < 9 || digits.length > 15) {
+        message.textContent = "Periksa kembali nomor WhatsApp kamu.";
         return;
       }
 
-      trackBtn.disabled = true;
-      trackBtn.textContent = "Sedang mencari...";
-      result.classList.add("hidden");
-      setMessage("Memeriksa data pesanan...");
+      searchBtn.disabled = true;
+      searchBtn.textContent = "Sedang mencari...";
+      message.textContent = "";
+      orderList.replaceChildren();
+      results.hidden = true;
 
       try {
-        const { data, error } = await db.rpc("track_order", {
-          p_order_code: code,
-          p_customer_phone: phone
-        });
+        const { data, error } = await db.rpc(
+          "track_orders_by_phone",
+          { p_phone: phone }
+        );
 
         if (error) throw error;
 
+        results.hidden = false;
+
         if (!data || data.length === 0) {
-          setMessage(
-            "Pesanan tidak ditemukan. Periksa kembali kode pesanan dan nomor WhatsApp yang digunakan saat checkout.",
-            "error"
-          );
+          message.textContent =
+            "Belum ada pesanan yang ditemukan untuk nomor tersebut. Periksa kembali nomor WhatsApp yang digunakan saat memesan.";
           return;
         }
 
-        renderOrder(data[0]);
-        setMessage("Pesanan ditemukan!", "success");
+        message.textContent =
+          "Ditemukan " + data.length +
+          " pesanan terbaru. Maksimal 20 pesanan ditampilkan.";
+
+        data.forEach(showOrder);
       } catch (error) {
-        console.error("Tracking error:", error);
-        setMessage(
-          "Belum bisa memuat status pesanan. Pastikan fungsi pelacakan Supabase sudah dibuat. Jika masih gagal, periksa konfigurasi database.",
-          "error"
-        );
+        console.error(error);
+        message.textContent =
+          "Gagal mencari pesanan. Pastikan fungsi lacak sudah dibuat di Supabase, lalu coba lagi.";
       } finally {
-        trackBtn.disabled = false;
-        trackBtn.textContent = "🔍 Lacak Sekarang";
+        searchBtn.disabled = false;
+        searchBtn.textContent = "Cari Pesanan";
       }
     });
   </script>
