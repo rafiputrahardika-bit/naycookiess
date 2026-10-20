@@ -1,0 +1,282 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin NayCookies</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #fff8f1; color: #493326;
+    }
+    main { max-width: 1000px; margin: auto; }
+    h1 { color: #874b2b; }
+    .panel, .order {
+      background: white; border-radius: 14px;
+      padding: 18px; margin: 16px 0;
+      box-shadow: 0 3px 14px #6a3b1710;
+    }
+    input, button, select {
+      padding: 11px; border-radius: 8px;
+      border: 1px solid #dfc9b8; margin: 5px 0;
+      font-size: 15px;
+    }
+    input { width: 100%; }
+    button {
+      cursor: pointer; background: #874b2b;
+      color: white; border: none;
+    }
+    .order { border-left: 5px solid #d99b67; }
+    .muted { color: #806c5d; font-size: 14px; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .row select { flex: 1; min-width: 170px; }
+    #pesanan { margin-top: 20px; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>🍪 NayCookies Admin</h1>
+  <p class="muted">Dashboard untuk mengelola pesanan pelanggan.</p>
+
+  <section class="panel" id="loginPanel">
+    <h3>Login Admin</h3>
+    <form id="loginForm">
+      <input id="email" type="email" placeholder="Email admin" required>
+      <input id="password" type="password"
+        placeholder="Password admin Supabase" required>
+      <button type="submit">Login</button>
+    </form>
+    <p id="loginMsg" role="status"></p>
+  </section>
+
+  <section id="dashboard" hidden>
+    <div class="panel">
+      <div class="row">
+        <h3 style="flex:1">Daftar Pesanan</h3>
+        <button id="refreshBtn" type="button">Muat ulang</button>
+        <button id="logoutBtn" type="button">Logout</button>
+      </div>
+      <p id="statusMsg" role="status"></p>
+    </div>
+    <div id="pesanan"></div>
+  </section>
+</main>
+
+<script>
+  const SUPABASE_URL = "https://ohcohmrhnjjwhhmbggdp.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_F3qfvwEwH2lmkYCnRBI-Og_8csxHdEt";
+
+  const db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+  const $ = id => document.getElementById(id);
+
+  const statuses = [
+    ["new", "Pesanan baru"],
+    ["confirmed", "Dikonfirmasi"],
+    ["processing", "Sedang diproses"],
+    ["ready", "Siap diambil / dikirim"],
+    ["completed", "Selesai"],
+    ["cancelled", "Dibatalkan"]
+  ];
+
+  const payments = [
+    ["pending", "Belum dibayar"],
+    ["paid", "Sudah dibayar"],
+    ["failed", "Pembayaran gagal"]
+  ];
+
+  const rupiah = n => new Intl.NumberFormat("id-ID", {
+    style: "currency", currency: "IDR",
+    maximumFractionDigits: 0
+  }).format(n || 0);
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;",
+      '"': "&quot;", "'": "&#39;"
+    }[c]));
+  }
+
+  function optionList(options, selected) {
+    return options.map(([value, label]) =>
+      `<option value="${value}" ${value === selected ? "selected" : ""}>
+        ${label}
+      </option>`
+    ).join("");
+  }
+
+  function showDashboard(show) {
+    $("loginPanel").hidden = show;
+    $("dashboard").hidden = !show;
+  }
+
+  async function checkSession() {
+    const { data, error } = await db.auth.getSession();
+    if (error) {
+      $("loginMsg").textContent = error.message;
+      return;
+    }
+
+    if (data.session) {
+      showDashboard(true);
+      await loadOrders();
+    } else {
+      showDashboard(false);
+    }
+  }
+
+  $("loginForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    $("loginMsg").textContent = "Sedang login...";
+
+    const { error } = await db.auth.signInWithPassword({
+      email: $("email").value.trim(),
+      password: $("password").value
+    });
+
+    if (error) {
+      $("loginMsg").textContent = "Login gagal: " + error.message;
+      return;
+    }
+
+    $("password").value = "";
+    showDashboard(true);
+    await loadOrders();
+  });
+
+  async function loadOrders() {
+    $("statusMsg").textContent = "Memuat pesanan...";
+    $("pesanan").replaceChildren();
+
+    const { data, error } = await db
+      .from("orders")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      $("statusMsg").textContent =
+        "Gagal memuat pesanan: " + error.message;
+      return;
+    }
+
+    $("statusMsg").textContent =
+      `Total pesanan: ${data.length}`;
+
+    if (!data.length) {
+      $("pesanan").textContent = "Belum ada pesanan.";
+      return;
+    }
+
+    for (const order of data) {
+      const article = document.createElement("article");
+      article.className = "order";
+
+      const itemText = Array.isArray(order.items)
+        ? order.items.map(item =>
+            `${item.name || item.id} × ${item.quantity} — ${
+              rupiah(item.subtotal ?? (item.unit_price * item.quantity))
+            }`
+          ).join("\n")
+        : JSON.stringify(order.items, null, 2);
+
+      article.innerHTML = `
+        <h3>${escapeHTML(order.order_code)}</h3>
+        <p class="muted">${escapeHTML(
+          new Date(order.created_at).toLocaleString("id-ID")
+        )}</p>
+        <p><b>Pelanggan:</b> ${escapeHTML(order.customer_name)}</p>
+        <p><b>WhatsApp:</b> ${escapeHTML(order.customer_phone)}</p>
+        <p><b>Pengiriman:</b> ${escapeHTML(order.fulfillment_method)}</p>
+        <p><b>Alamat:</b> ${escapeHTML(order.delivery_address || "-")}</p>
+        <p><b>Pembayaran:</b> ${escapeHTML(order.payment_method)}</p>
+        <p><b>Total:</b> ${rupiah(order.total_amount)}</p>
+        <p><b>Produk:</b></p>
+        <pre>${escapeHTML(itemText)}</pre>
+        <div class="row">
+          <label>Status pesanan
+            <select class="order-status">
+              ${optionList(statuses, order.order_status)}
+            </select>
+          </label>
+          <label>Status pembayaran
+            <select class="payment-status">
+              ${optionList(payments, order.payment_status)}
+            </select>
+          </label>
+          <button type="button" class="save-btn">Simpan perubahan</button>
+        </div>
+        <p class="save-msg" role="status"></p>
+      `;
+
+      article.querySelector(".save-btn").addEventListener("click", async () => {
+        const msg = article.querySelector(".save-msg");
+        const orderStatus = article.querySelector(".order-status").value;
+        const paymentStatus = article.querySelector(".payment-status").value;
+
+        msg.textContent = "Menyimpan...";
+
+        const { data: userData, error: userError } =
+          await db.auth.getUser();
+
+        if (userError || !userData.user) {
+          msg.textContent = "Sesi admin berakhir. Login kembali.";
+          return;
+        }
+
+        if (userData.user.id !== "f8fce8f2-cfb9-4ea8-8a0b-6f8d67dbb544") {
+          msg.textContent = "Akun ini bukan admin yang diizinkan.";
+          return;
+        }
+
+        const { data: updated, error: updateError } = await db
+          .from("orders")
+          .update({
+            order_status: orderStatus,
+            payment_status: paymentStatus
+          })
+          .eq("id", order.id)
+          .select("id");
+
+        if (updateError) {
+          msg.textContent = "Gagal menyimpan: " + updateError.message;
+          return;
+        }
+
+        if (!updated || updated.length === 0) {
+          msg.textContent =
+            "Tidak ada perubahan yang tersimpan. Periksa izin admin.";
+          return;
+        }
+
+        msg.textContent = "Perubahan berhasil disimpan!";
+      });
+
+      $("pesanan").appendChild(article);
+    }
+  }
+
+  $("refreshBtn").addEventListener("click", loadOrders);
+
+  $("logoutBtn").addEventListener("click", async () => {
+    await db.auth.signOut();
+    showDashboard(false);
+    $("loginMsg").textContent = "Kamu sudah logout.";
+  });
+
+  db.auth.onAuthStateChange((_event, session) => {
+    if (!session) showDashboard(false);
+  });
+
+  checkSession();
+</script>
+</body>
+</html>
