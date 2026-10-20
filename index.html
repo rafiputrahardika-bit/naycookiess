@@ -1,0 +1,270 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#6f3e2e">
+  <title>NayCookies | Freshly Baked With Love</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #fffaf4;
+      color: #43291f;
+    }
+    header {
+      background: #6f3e2e;
+      color: white;
+      padding: 18px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo { font-size: 24px; font-weight: bold; }
+    .hero {
+      padding: 55px 6%;
+      background: #f4dfc8;
+      text-align: center;
+    }
+    .hero h1 { font-size: clamp(30px, 6vw, 48px); margin: 0 0 12px; }
+    .hero p { line-height: 1.7; }
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 17px;
+      cursor: pointer;
+      font-weight: bold;
+      background: #6f3e2e;
+      color: white;
+    }
+    button:hover { opacity: .88; }
+    main { padding: 30px 6%; }
+    h2 { margin-bottom: 20px; }
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .product {
+      background: white;
+      border: 1px solid #eadbce;
+      border-radius: 16px;
+      overflow: hidden;
+      padding-bottom: 18px;
+    }
+    .cookie-art {
+      height: 160px;
+      display: grid;
+      place-items: center;
+      font-size: 75px;
+      background: #f3e2cf;
+    }
+    .product h3, .product p, .product .price {
+      margin: 12px 16px;
+    }
+    .price { font-weight: bold; color: #8b4d32; }
+    .product button { margin-left: 16px; }
+    .panel {
+      background: white;
+      border: 1px solid #eadbce;
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 28px;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 12px 0;
+    }
+    label { display: block; margin-top: 14px; font-weight: bold; }
+    input, select, textarea {
+      width: 100%;
+      margin-top: 7px;
+      padding: 12px;
+      border: 1px solid #d8c6b8;
+      border-radius: 9px;
+      font: inherit;
+      background: white;
+    }
+    .total { font-size: 19px; font-weight: bold; margin: 20px 0; }
+    footer {
+      text-align: center;
+      padding: 25px;
+      background: #6f3e2e;
+      color: white;
+      margin-top: 35px;
+    }
+    .hint { color: #775f52; font-size: 14px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">🍪 NayCookies</div>
+    <button onclick="document.getElementById('keranjang').scrollIntoView({behavior:'smooth'})">
+      Keranjang (<span id="jumlah">0</span>)
+    </button>
+  </header>
+
+  <section class="hero">
+    <h1>Fresh Cookies, Made With Love 🤎</h1>
+    <p>Cookies lezat untuk menemani setiap momen spesialmu.</p>
+    <button onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">
+      Lihat Menu
+    </button>
+  </section>
+
+  <main>
+    <section id="menu">
+      <h2>🍪 Menu Cookies</h2>
+      <div class="products" id="daftarProduk"></div>
+    </section>
+
+    <section class="panel" id="keranjang">
+      <h2>🛒 Keranjang Belanja</h2>
+      <div id="isiKeranjang">Keranjang masih kosong, yuk pilih cookies!</div>
+      <div class="total">Total: <span id="total">Rp0</span></div>
+
+      <h2>📝 Data Pemesanan</h2>
+      <form id="formPesanan">
+        <label for="nama">Nama pemesan</label>
+        <input id="nama" required placeholder="Nama lengkap">
+
+        <label for="hp">Nomor WhatsApp</label>
+        <input id="hp" required type="tel" placeholder="08xxxxxxxxxx">
+
+        <label for="metode">Metode pembayaran</label>
+        <select id="metode">
+          <option>COD</option>
+          <option>Transfer Bank</option>
+          <option>QRIS</option>
+        </select>
+
+        <label for="pengiriman">Pengambilan pesanan</label>
+        <select id="pengiriman">
+          <option>Diantar ke alamat</option>
+          <option>Ambil sendiri</option>
+        </select>
+
+        <label for="alamat">Alamat / catatan pesanan</label>
+        <textarea id="alamat" rows="3" placeholder="Isi alamat jika diantar, atau catatan lainnya"></textarea>
+
+        <p class="hint">
+          Ini masih versi percobaan. Pesanan belum dikirim ke pemilik dan belum tersimpan di database.
+        </p>
+        <button type="submit">Coba Checkout</button>
+      </form>
+      <div id="hasil" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer>© 2026 NayCookies · Freshly Baked With Love 🤎</footer>
+
+  <script>
+    const produk = [
+      { id: 1, nama: "Choco Chip Cookies", harga: 35000, emoji: "🍪", deskripsi: "Cookies dengan choco chips." },
+      { id: 2, nama: "Double Chocolate", harga: 40000, emoji: "🍫", deskripsi: "Cokelat yang kaya rasa." },
+      { id: 3, nama: "Red Velvet Cookies", harga: 40000, emoji: "❤️", deskripsi: "Cookies red velvet yang lembut." },
+      { id: 4, nama: "Matcha Cookies", harga: 40000, emoji: "🍵", deskripsi: "Cookies dengan cita rasa matcha." }
+    ];
+
+    const keranjang = {};
+
+    const rupiah = angka => new Intl.NumberFormat("id-ID", {
+      style: "currency", currency: "IDR", maximumFractionDigits: 0
+    }).format(angka);
+
+    function tampilkanProduk() {
+      document.getElementById("daftarProduk").innerHTML = produk.map(p => `
+        <article class="product">
+          <div class="cookie-art">${p.emoji}</div>
+          <h3>${p.nama}</h3>
+          <p>${p.deskripsi}</p>
+          <div class="price">${rupiah(p.harga)}</div>
+          <button type="button" onclick="tambah(${p.id})">+ Tambah</button>
+        </article>
+      `).join("");
+    }
+
+    function tambah(id) {
+      keranjang[id] = (keranjang[id] || 0) + 1;
+      tampilkanKeranjang();
+    }
+
+    function ubahJumlah(id, perubahan) {
+      keranjang[id] = (keranjang[id] || 0) + perubahan;
+      if (keranjang[id] <= 0) delete keranjang[id];
+      tampilkanKeranjang();
+    }
+
+    function tampilkanKeranjang() {
+      const item = produk.filter(p => keranjang[p.id]);
+      const banyak = item.reduce((sum, p) => sum + keranjang[p.id], 0);
+      const total = item.reduce((sum, p) => sum + p.harga * keranjang[p.id], 0);
+
+      document.getElementById("jumlah").textContent = banyak;
+      document.getElementById("total").textContent = rupiah(total);
+
+      document.getElementById("isiKeranjang").innerHTML = item.length
+        ? item.map(p => `
+          <div class="cart-item">
+            <div>${p.nama}<br>${rupiah(p.harga)} × ${keranjang[p.id]}</div>
+            <div>
+              <button type="button" onclick="ubahJumlah(${p.id},-1)">−</button>
+              <button type="button" onclick="ubahJumlah(${p.id},1)">+</button>
+            </div>
+          </div>
+        `).join("")
+        : "Keranjang masih kosong, yuk pilih cookies!";
+
+      return total;
+    }
+
+    document.getElementById("formPesanan").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      if (!Object.keys(keranjang).length) {
+        alert("Cuy, pilih cookies dulu sebelum checkout!");
+        return;
+      }
+
+      const ringkasan = produk
+        .filter(p => keranjang[p.id])
+        .map(p => `${p.nama} x${keranjang[p.id]} = ${rupiah(p.harga * keranjang[p.id])}`)
+        .join("\n");
+
+      const nama = document.getElementById("nama").value.trim();
+      const hp = document.getElementById("hp").value.trim();
+      const metode = document.getElementById("metode").value;
+      const pengiriman = document.getElementById("pengiriman").value;
+      const alamat = document.getElementById("alamat").value.trim();
+
+      document.getElementById("hasil").innerHTML = `
+        <h3>Ringkasan Pesanan</h3>
+        <p>Nama: ${escapeHTML(nama)}</p>
+        <p>Nomor HP: ${escapeHTML(hp)}</p>
+        <p>Metode pembayaran: ${escapeHTML(metode)}</p>
+        <p>Pengiriman: ${escapeHTML(pengiriman)}</p>
+        <p>Alamat/catatan: ${escapeHTML(alamat || "-")}</p>
+        <pre style="white-space:pre-wrap">${escapeHTML(ringkasan)}</pre>
+        <p><b>Total: ${rupiah(tampilkanKeranjang())}</b></p>
+        <p class="hint">Ringkasan ini hanya tampil di perangkat ini. Pesanan belum dikirim.</p>
+      `;
+      document.getElementById("hasil").scrollIntoView({behavior:"smooth"});
+    });
+
+    function escapeHTML(teks) {
+      return teks.replace(/[&<>"']/g, karakter => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;",
+        '"': "&quot;", "'": "&#39;"
+      })[karakter]);
+    }
+
+    tampilkanProduk();
+    tampilkanKeranjang();
+  </script>
+</body>
+</html>
